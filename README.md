@@ -1,95 +1,135 @@
-# Terraform Project Template
+# AWS Lambda Python Project
 
 ## Overview
 
-This is a base template for creating new Terraform ter_temp projects. It provides a standardized structure and basic configuration for AWS infrastructure deployment.
+This project deploys a Python-based AWS Lambda function using Terraform. The Lambda function returns a simple "Hello" response with a 200 status code.
 
 ## Prerequisites
 
 - AWS CLI configured
-- Terraform installed (version 1.0.0 or higher)
-- PowerShell 5.1 or higher
+- Terraform (version >= 1.11.3)
+- Python 3.9
 
-## Template Structure
+## Project Structure
 
 ```
-template_terraform_project/
-├── ps_scripts/                    # PowerShell scripts
-├── terraform__main_files/         # Terraform template files
-│   ├── backend.tf                 # Backend template configuration
-│   ├── main.tf                    # Main template
-│   ├── outputs.tf                 # Output template
-│   ├── provider.tf                # Provider template
-│   ├── README.md                  # Project README template
-│   ├── terraform.tfvars           # Terraform variables template
-|   └── variables.tf               # Variables template
-│   └── versions.tf                # Version template
-└── New-ProjectFromTemplate.ps1                       # Main deployment script
+aws-lambda-python/
+├── modules/
+│   └── lambda_function/          # Lambda module
+│       ├── src/                  # Python source code
+│       │   └── main.py          # Lambda handler
+│       ├── data.tf              # Archive file configuration
+│       ├── iam.tf               # IAM roles and policies
+│       ├── lambda.tf            # Lambda function configuration
+│       ├── outputs.tf           # Module outputs
+│       └── variables.tf         # Module variables
+├── backend.tf                   # S3 backend configuration
+├── main.tf                     # Main Terraform configuration
+├── outputs.tf                  # Project outputs
+├── providers.tf                # AWS provider configuration
+├── variables.tf                # Project variables
+├── versions.tf                 # Version constraints
+└── terraform.tfvars           # Variable values
 ```
-
-## Usage
-
-1. Clone this template
-2. Run the PowerShell script with your project name:
-
-```powershell
-.\New-ProjectFromTemplate.ps1 -ProjectName "your_project_name"
-```
-
-## Template Features
-
-- **Automated Setup**: PowerShell scripts for project initialization
-- **State Management**: Configured for remote state with S3 backend
-- **Provider Configuration**: Pre-configured AWS provider settings
-- **Variable Management**: Structured variable definitions
-- **Documentation**: Standardized README template
 
 ## Configuration
 
-### Required Variables
-
-Update the following variables in `terraform.tfvars` or through environment variables:
-
-```hcl
-project_name = "your_project_name"
-aws_region   = "your_aws_region"
-```
-
 ### State Management
 
-The template is configured to use S3 for state management. Update the backend configuration in `provider.tf`:
+The project uses an S3 backend for state management:
 
 ```hcl
-backend "s3" {
-  bucket = "your-terraform-state-bucket"
-  key    = "your-project-name/terraform.tfstate"
-  region = "your-aws-region"
-}
+bucket = "dubovsky-andrey-terraform-stage-bucket"
+key    = "aws-lambda-python/terraform.tfstate"
+region = "us-east-1"
 ```
+
+### Lambda Function Settings
+
+The Lambda function is configured with:
+
+- Runtime: Python 3.9
+- Handler: main.lambda_handler
+- Memory: 128 MB
+- Timeout: 30 seconds
+- Basic execution role
 
 ## Deployment
 
-After configuration, deploy using:
+1. Initialize Terraform:
 
 ```bash
 terraform init
+```
+
+2. Review the deployment plan:
+
+```bash
 terraform plan
+```
+
+3. Apply the changes:
+
+```bash
 terraform apply
 ```
 
-## Best Practices
+## Outputs
 
-- Always review the generated plan before applying
-- Use consistent naming conventions
-- Keep sensitive data in separate variable files
-- Document all major changes
+After deployment, the following outputs are available:
 
-## Contributing
+- `lambda_function_name`: Name of the deployed Lambda function
+- `lambda_function_arn`: ARN of the Lambda function
+- `log_group_name`: CloudWatch Log Group name for Lambda logs
 
-To contribute to this template:
+## Lambda Function Code
 
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+The Lambda function returns a simple response:
 
-## License
+```python
+def lambda_handler(event, context):
+    return {
+        "statusCode": 200,
+        "body": "Hello from Lambda aws-lambda-python!"
+    }
+```
+
+## Testing the Function
+
+After deployment, you can test the Lambda function using AWS CLI:
+
+1. Invoke the function and save the response:
+
+```bash
+aws lambda invoke \
+  --function-name my_lambda_function \
+  --payload '{}' \
+  response.json
+```
+
+2. View the response body:
+
+```bash
+cat response.json
+```
+
+Expected output:
+
+```json
+{
+  "statusCode": 200,
+  "body": "Hello from Lambda aws-lambda-python!"
+}
+```
+
+3. Check the most recent CloudWatch logs:
+
+```bash
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/my_lambda_function \
+  --limit 5
+```
+
+This will show the last 5 log entries from your Lambda function's execution, including any custom logging messages, errors, or execution details.
+
+Note: Replace `aws-lambda-python` with your actual Lambda function name from the outputs.
