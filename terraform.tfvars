@@ -15,3 +15,6 @@ lambda_policy_arns = [
 # Performance settings
 lambda_timeout     = 30
 lambda_memory_size = 128
+
+zip_path = "lambda.zip"
+file_type = "zip"

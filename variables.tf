@@ -39,3 +39,11 @@ variable "aws_region" {
   description = "AWS region"
   type        = string
 }
+
+variable "file_type" {
+  type = string
+}
+
+variable "zip_path" {
+  type = string
+}

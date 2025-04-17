@@ -10,4 +10,6 @@ module "lambda_function" {
   policy_arns      = var.lambda_policy_arns
   timeout          = var.lambda_timeout
   memory_size      = var.lambda_memory_size
+  zip_path         = var.zip_path
+  file_type        = var.file_type
 }

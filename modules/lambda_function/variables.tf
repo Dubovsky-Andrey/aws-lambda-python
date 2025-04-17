@@ -29,3 +29,11 @@ variable "timeout" {
 variable "memory_size" {
   type = number
 }
+
+variable "file_type" {
+  type = string
+}
+
+variable "zip_path" {
+  type = string
+}
