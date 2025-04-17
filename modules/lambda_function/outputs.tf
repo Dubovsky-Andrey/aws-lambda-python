@@ -7,5 +7,5 @@ output "lambda_function_arn" {
 }
 
 output "log_group_name" {
-  value = "/aws/lambda/${aws_lambda_function.aws-lambda-function.function_name}"  # <- add this
+  value = "/aws/lambda/${aws_lambda_function.aws-lambda-function.function_name}" 
 }
